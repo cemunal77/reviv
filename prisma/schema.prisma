@@ -1,0 +1,214 @@
+// schema.prisma — Reviv.ch
+// Stack : Next.js + Prisma + MySQL (Infomaniak)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// UTILISATEURS
+// ─────────────────────────────────────────
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  city          String?
+  canton        String?
+  phone         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Vérification
+  verification  Verification?
+
+  // Relations
+  listings      Listing[]
+  questions     Question[]
+  answers       Answer[]
+  savedListings SavedListing[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────
+// VÉRIFICATION D'IDENTITÉ
+// ─────────────────────────────────────────
+model Verification {
+  id              Int                @id @default(autoincrement())
+  userId          Int                @unique
+  user            User               @relation(fields: [userId], references: [id])
+
+  // Statuts possibles : PENDING | APPROVED | REJECTED
+  idStatus        VerificationStatus @default(PENDING)
+  idDocumentUrl   String?            // URL du fichier stocké (recto)
+  idDocumentBack  String?            // URL verso
+
+  addrStatus      VerificationStatus @default(PENDING)
+  addrDocumentUrl String?            // Facture / relevé bancaire
+
+  // Statut global (PENDING | APPROVED | REJECTED)
+  globalStatus    VerificationStatus @default(PENDING)
+  reviewedAt      DateTime?
+  reviewNote      String?            // Note interne admin si rejet
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@map("verifications")
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─────────────────────────────────────────
+// ANNONCES
+// ─────────────────────────────────────────
+model Listing {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+
+  title         String
+  description   String        @db.Text
+  category      Category
+  condition     Condition
+  price         Decimal       @db.Decimal(10, 2)
+  isFree        Boolean       @default(false)
+
+  // Type de vente
+  saleType      SaleType      @default(FIXED)
+  auctionEndsAt DateTime?     // Rempli seulement si saleType = AUCTION
+
+  // Localisation
+  city          String
+  canton        String
+
+  // Remise
+  deliveryMode  DeliveryMode  @default(IN_PERSON)
+
+  // Statut de l'annonce
+  status        ListingStatus @default(ACTIVE)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  expiresAt     DateTime?
+
+  // Relations
+  photos        ListingPhoto[]
+  questions     Question[]
+  savedBy       SavedListing[]
+
+  @@map("listings")
+}
+
+enum Category {
+  ELECTRONICS
+  BIKES
+  HOME
+  TOOLS
+  CLOTHING
+  SPORTS
+  BOOKS
+  SPARE_PARTS
+  OTHER
+}
+
+enum Condition {
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  FOR_REPAIR
+}
+
+enum SaleType {
+  FIXED
+  AUCTION
+  FREE
+}
+
+enum DeliveryMode {
+  IN_PERSON
+  SHIPPING
+  BOTH
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  EXPIRED
+  DELETED
+}
+
+// ─────────────────────────────────────────
+// PHOTOS D'ANNONCE
+// ─────────────────────────────────────────
+model ListingPhoto {
+  id        Int     @id @default(autoincrement())
+  listingId Int
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String  // URL Infomaniak Object Storage ou dossier public
+  order     Int     @default(0) // Position dans la galerie
+  isMain    Boolean @default(false)
+
+  @@map("listing_photos")
+}
+
+// ─────────────────────────────────────────
+// QUESTIONS (publiques, sur l'annonce)
+// ─────────────────────────────────────────
+model Question {
+  id        Int      @id @default(autoincrement())
+  listingId Int
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  // Une question = au plus une réponse (du vendeur uniquement)
+  answer    Answer?
+
+  @@map("questions")
+}
+
+// ─────────────────────────────────────────
+// RÉPONSES (vendeur uniquement)
+// ─────────────────────────────────────────
+model Answer {
+  id         Int      @id @default(autoincrement())
+  questionId Int      @unique  // 1 question → max 1 réponse
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId     Int      // Doit être le userId du vendeur (vérifié côté API)
+  user       User     @relation(fields: [userId], references: [id])
+
+  body       String   @db.Text
+  createdAt  DateTime @default(now())
+
+  @@map("answers")
+}
+
+// ─────────────────────────────────────────
+// ANNONCES SAUVEGARDÉES (favoris)
+// ─────────────────────────────────────────
+model SavedListing {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  listingId Int
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  savedAt   DateTime @default(now())
+
+  @@unique([userId, listingId]) // Un user ne peut sauvegarder qu'une fois la même annonce
+  @@map("saved_listings")
+}
