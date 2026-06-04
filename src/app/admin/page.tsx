@@ -68,6 +68,9 @@ const initUsers: User[] = [
 ];
 
 // ─── Styles ───────────────────────────────────────────────
+const badge = (c: string): React.CSSProperties => ({ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: c === "APPROVED" || c === "ACTIVE" ? "#EAF3EB" : c === "PENDING" ? "#FEF3C7" : "#FEE2E2", color: c === "APPROVED" || c === "ACTIVE" ? "#2E4A30" : c === "PENDING" ? "#92400E" : "#991B1B" });
+const btnSm = (c: string): React.CSSProperties => ({ background: c, color: "#fff", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 4 });
+
 const s: Record<string, React.CSSProperties> = {
   body: { fontFamily: "Inter,system-ui,sans-serif", background: "#F7F7F4", minHeight: "100vh", color: "#1A1A1A" },
   loginWrap: { display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#F0EDE2" },
@@ -90,8 +93,6 @@ const s: Record<string, React.CSSProperties> = {
   table: { width: "100%", borderCollapse: "collapse" as const, background: "#fff", borderRadius: 12, overflow: "hidden", border: "1px solid #D9D9D0" },
   th: { background: "#F7F7F4", padding: "10px 14px", textAlign: "left" as const, fontSize: 12, fontWeight: 700, color: "#6B7B6C", borderBottom: "1px solid #D9D9D0" },
   td: { padding: "11px 14px", fontSize: 13, borderBottom: "1px solid #f0f0ee", verticalAlign: "middle" as const },
-  badge: (c: string) => ({ display: "inline-flex", alignItems: "center", padding: "3px 9px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: c === "APPROVED" || c === "ACTIVE" ? "#EAF3EB" : c === "PENDING" ? "#FEF3C7" : "#FEE2E2", color: c === "APPROVED" || c === "ACTIVE" ? "#2E4A30" : c === "PENDING" ? "#92400E" : "#991B1B" }),
-  btnSm: (c: string) => ({ background: c, color: "#fff", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 4 }),
   sectionCard: { background: "#fff", border: "1px solid #D9D9D0", borderRadius: 12, marginBottom: 20, overflow: "hidden" },
   sectionHead: { padding: "14px 18px", borderBottom: "1px solid #D9D9D0", display: "flex", justifyContent: "space-between", alignItems: "center" },
   sectionTitle: { fontSize: 15, fontWeight: 800, color: "#2E4A30" },
