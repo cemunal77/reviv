@@ -154,7 +154,7 @@ export default function AdminPage() {
         {tabs.map(t => (
           <button key={t.id} style={{ ...s.sideItem, ...(tab === t.id ? s.sideItemActive : {}) }} onClick={() => setTab(t.id)}>{t.label}</button>
         ))}
-        <div style={{ marginTop: "auto", padding: "20px", borderTop: "1px solid rgba(255,255,255,.1)", marginTop: 40 }}>
+        <div style={{ padding: "20px", borderTop: "1px solid rgba(255,255,255,.1)", marginTop: 40 }}>
           <button style={{ ...s.sideItem, color: "rgba(255,100,100,.8)", fontSize: 13 }} onClick={() => setAuth(false)}>🚪 Se déconnecter</button>
         </div>
       </div>
