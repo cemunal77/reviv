@@ -1,9 +1,7 @@
 "use client";
-export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut, SessionProvider } from "next-auth/react";
 
-// ─── STYLES ───────────────────────────────────────────────
 const C = {
   sage:"#5A8C5C", sageL:"#C8DEC9", sageBg:"#EAF3EB",
   beige:"#F0EDE2", dark:"#2E4A30", muted:"#6B7B6C",
@@ -16,7 +14,6 @@ const pill = (bg: string, color: string): React.CSSProperties => ({
   borderRadius:999, fontSize:11, fontWeight:700,
 });
 
-// ─── TIMER HOOK ───────────────────────────────────────────
 function useTimer(init: string) {
   const [t, setT] = useState(init);
   useEffect(() => {
@@ -35,7 +32,6 @@ function useTimer(init: string) {
   return t;
 }
 
-// ─── COMPONENTS ───────────────────────────────────────────
 function TrustBar() {
   return (
     <div style={{ background:C.dark, color:"#fff", fontSize:12, padding:"7px 0", textAlign:"center" }}>
@@ -79,7 +75,7 @@ function Header({ go }: { go: (p: string) => void }) {
             </>
           ) : (
             <>
-              <a href="/login" style={{ fontSize:13, fontWeight:600, color:C.dark }}>Se connecter</a>
+              <a href="/login" style={{ fontSize:13, fontWeight:600, color:C.dark, textDecoration:"none" }}>Se connecter</a>
               <a href="/register" style={{ background:C.sage, color:"#fff", padding:"9px 15px", borderRadius:r, fontWeight:700, fontSize:13, textDecoration:"none" }}>
                 Créer un compte
               </a>
@@ -119,7 +115,6 @@ function Card({ title, price, city, condition, emoji, bg, timerId, hot, onClick 
   );
 }
 
-// ─── PAGES ────────────────────────────────────────────────
 function HomePage({ go }: { go: (p: string) => void }) {
   const [filter, setFilter] = useState("Tout");
   const filters = ["Tout","Électronique","Vélos","Maison","Outils","Vêtements","Sports","Livres"];
@@ -141,7 +136,7 @@ function HomePage({ go }: { go: (p: string) => void }) {
         <div style={{ maxWidth:1120, margin:"0 auto", padding:"0 20px", display:"flex", alignItems:"center", gap:32 }}>
           <div style={{ flex:1.2 }}>
             <h1 style={{ fontSize:30, fontWeight:800, color:C.dark, lineHeight:1.15, marginBottom:8 }}>Rien ne se perd,<br/>tout se revend.</h1>
-            <p style={{ color:C.muted, fontSize:14, marginBottom:18 }}>La marketplace 100% circulaire de Suisse — uniquement des objets d'occasion,<br/>entre particuliers vérifiés, sans frais.</p>
+            <p style={{ color:C.muted, fontSize:14, marginBottom:18 }}>La marketplace 100% circulaire de Suisse — uniquement des objets d&apos;occasion,<br/>entre particuliers vérifiés, sans frais.</p>
             <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:18 }}>
               {["✓ Vendeurs vérifiés","♻️ 0 produit neuf","🎁 Annonces gratuites","🇨🇭 Suisse uniquement"].map(t => (
                 <span key={t} style={{ background:"#fff", border:`1px solid ${C.sageL}`, color:C.sage, padding:"5px 11px", borderRadius:999, fontSize:12, fontWeight:700 }}>{t}</span>
@@ -180,7 +175,6 @@ function HomePage({ go }: { go: (p: string) => void }) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
           {cards1.map(c => <Card key={c.title} {...c} onClick={() => go("listing")} />)}
         </div>
-
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", margin:"28px 0 12px" }}>
           <h2 style={{ fontSize:17, fontWeight:800, color:C.dark, display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ width:8, height:8, background:C.sage, borderRadius:"50%", display:"inline-block" }}></span> Nouvelles annonces
@@ -190,7 +184,6 @@ function HomePage({ go }: { go: (p: string) => void }) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
           {cards2.map(c => <Card key={c.title} {...c} onClick={() => go("listing")} />)}
         </div>
-
         <div style={{ display:"flex", alignItems:"center", margin:"28px 0 12px" }}>
           <h2 style={{ fontSize:17, fontWeight:800, color:C.dark, display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ width:8, height:8, background:C.sage, borderRadius:"50%", display:"inline-block" }}></span> Catégories
@@ -205,17 +198,16 @@ function HomePage({ go }: { go: (p: string) => void }) {
             </div>
           ))}
         </div>
-
         <div style={{ background:C.dark, color:"#fff", borderRadius:rl, padding:"22px 28px", marginBottom:24, display:"flex", alignItems:"center", gap:32 }}>
           <div style={{ flex:1.2 }}>
             <h3 style={{ fontSize:16, fontWeight:800, marginBottom:6, color:C.sageL }}>La Charte Reviv</h3>
-            <p style={{ fontSize:13, opacity:.8, lineHeight:1.6 }}>Reviv.ch n'accepte que les objets d'occasion vendus par des particuliers dont l'identité et l'adresse en Suisse ont été vérifiées.</p>
+            <p style={{ fontSize:13, opacity:.8, lineHeight:1.6 }}>Reviv.ch n&apos;accepte que les objets d&apos;occasion vendus par des particuliers dont l&apos;identité et l&apos;adresse en Suisse ont été vérifiées.</p>
           </div>
           <div style={{ display:"flex", gap:20, flex:1 }}>
-            {[["✓ Identité vérifiée","Carte d'identité contrôlée"],["✓ Adresse vérifiée","Domicile en Suisse confirmé"],["✓ 0 produit neuf","Uniquement d'occasion"]].map(([t,d]) => (
+            {[["Identité vérifiée","Carte d'identité contrôlée"],["Adresse vérifiée","Domicile en Suisse confirmé"],["0 produit neuf","Uniquement d'occasion"]].map(([t,d]) => (
               <div key={t} style={{ display:"flex", alignItems:"flex-start", gap:8, fontSize:12, opacity:.85 }}>
                 <div style={{ background:C.sage, width:22, height:22, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, fontSize:11 }}>✓</div>
-                <div><strong style={{ display:"block", marginBottom:2 }}>{t.replace("✓ ","")}</strong>{d}</div>
+                <div><strong style={{ display:"block", marginBottom:2 }}>{t}</strong>{d}</div>
               </div>
             ))}
           </div>
@@ -265,7 +257,6 @@ function ListingPage({ go }: { go: (p: string) => void }) {
               ℹ️ <strong style={{ color:C.dark }}>Pas de messagerie privée sur Reviv.ch</strong> — posez vos questions publiquement ci-dessous.
             </div>
           </div>
-
           <div style={{ marginTop:28 }}>
             <h2 style={{ fontSize:17, fontWeight:800, color:C.dark, marginBottom:4, display:"flex", alignItems:"center", gap:8 }}>
               <span style={{ width:8, height:8, background:C.sage, borderRadius:"50%", display:"inline-block" }}></span> Questions & Réponses
@@ -299,16 +290,15 @@ function ListingPage({ go }: { go: (p: string) => void }) {
             </div>
           </div>
         </div>
-
         <div>
           <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:rl, padding:20, marginBottom:14 }}>
             <div style={{ fontSize:32, fontWeight:800, color:C.dark, marginBottom:4 }}>CHF 220.–</div>
-            <div style={{ fontSize:12, color:C.sage, fontWeight:600, marginBottom:16 }}>🎁 Annonce gratuite · ♻️ Objet d'occasion</div>
-            <button onClick={() => document.querySelector("input")?.focus()} style={{ width:"100%", background:C.sage, color:"#fff", border:"none", borderRadius:r, padding:13, fontSize:15, fontWeight:700, marginBottom:8, cursor:"pointer" }}>
+            <div style={{ fontSize:12, color:C.sage, fontWeight:600, marginBottom:16 }}>🎁 Annonce gratuite · ♻️ Objet d&apos;occasion</div>
+            <button style={{ width:"100%", background:C.sage, color:"#fff", border:"none", borderRadius:r, padding:13, fontSize:15, fontWeight:700, marginBottom:8, cursor:"pointer" }}>
               💬 Poser une question
             </button>
             <button style={{ width:"100%", background:"#fff", border:`1.5px solid ${C.border}`, borderRadius:r, padding:12, fontSize:14, fontWeight:600, color:C.muted, cursor:"pointer" }}>
-              ♡ Sauvegarder l'annonce
+              ♡ Sauvegarder l&apos;annonce
             </button>
           </div>
           <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:rl, padding:20, marginBottom:14 }}>
@@ -327,7 +317,7 @@ function ListingPage({ go }: { go: (p: string) => void }) {
             </div>
           </div>
           <div style={{ background:C.sageBg, border:`1px solid ${C.sageL}`, borderRadius:r, padding:"12px 14px", fontSize:12, color:C.sage }}>
-            🌿 <strong>Impact estimé</strong> : environ <strong>18 kg de CO₂</strong> économisés par rapport à l'achat neuf.
+            🌿 <strong>Impact estimé</strong> : environ <strong>18 kg de CO₂</strong> économisés par rapport à l&apos;achat neuf.
           </div>
         </div>
       </div>
@@ -338,12 +328,12 @@ function ListingPage({ go }: { go: (p: string) => void }) {
 function PublishPage({ go }: { go: (p: string) => void }) {
   const { data: session } = useSession();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ title:"", category:"", description:"", condition:"", price:"", saleType:"Prix fixe", city:"", canton:"", delivery:"En mains propres" });
+  const [form, setForm] = useState({ title:"", category:"", description:"", condition:"", price:"", city:"" });
   const [photos, setPhotos] = useState<string[]>([]);
   const emojis = ["📱","🚲","👕","🔧","💡","📚","⚙️","🛋️"];
 
   if (!session) return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", flexDirection:"column", gap:16, fontFamily:"Inter,sans-serif" }}>
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", flexDirection:"column", gap:16 }}>
       <div style={{ fontSize:48 }}>🔒</div>
       <h2 style={{ fontSize:20, fontWeight:800, color:C.dark }}>Connexion requise</h2>
       <p style={{ color:C.muted }}>Vous devez être connecté pour publier une annonce.</p>
@@ -355,7 +345,7 @@ function PublishPage({ go }: { go: (p: string) => void }) {
   const conditions = [["✨","Comme neuf","Jamais utilisé"],["👍","Très bon état","Légères traces"],["✅","Bon état","Quelques marques"],["🔧","À réparer","Défauts fonctionnels"]];
 
   return (
-    <div style={{ maxWidth:760, margin:"0 auto", padding:"32px 20px", fontFamily:"Inter,sans-serif" }}>
+    <div style={{ maxWidth:760, margin:"0 auto", padding:"32px 20px" }}>
       <h1 style={{ fontSize:24, fontWeight:800, color:C.dark, marginBottom:6 }}>Publier une annonce</h1>
       <p style={{ fontSize:14, color:C.muted, marginBottom:28 }}>Gratuit pour les particuliers · Identité vérifiée requise</p>
       <div style={{ display:"flex", marginBottom:32, borderRadius:r, overflow:"hidden", border:`1px solid ${C.border}` }}>
@@ -363,10 +353,8 @@ function PublishPage({ go }: { go: (p: string) => void }) {
           <div key={t} style={{ flex:1, padding:10, textAlign:"center", fontSize:12, fontWeight:600, background: step===i+1 ? C.sage : step>i+1 ? C.sageBg : C.light, color: step===i+1 ? "#fff" : step>i+1 ? C.sage : C.muted, borderRight: i<3 ? `1px solid ${C.border}` : "none" }}>{t}</div>
         ))}
       </div>
-
       {step===1 && (
         <div>
-          <label style={{ fontSize:13, fontWeight:600, color:C.dark, display:"block", marginBottom:6 }}>Photos <span style={{ color:C.muted, fontWeight:400 }}>(min. 1, max. 8)</span></label>
           <div onClick={() => { if(photos.length<8) setPhotos(p => [...p, emojis[p.length%8]]); }}
             style={{ border:`2px dashed ${C.border}`, borderRadius:rl, padding:32, textAlign:"center", color:C.muted, cursor:"pointer" }}>
             <div style={{ fontSize:32, marginBottom:8 }}>📷</div>
@@ -387,18 +375,16 @@ function PublishPage({ go }: { go: (p: string) => void }) {
           </div>
         </div>
       )}
-
       {step===2 && (
         <div>
-          {[["Titre","title","text","Ex: Vélo de route Trek taille 54"],["Description","description","textarea","Décrivez honnêtement l'objet…"]].map(([label,key,type,ph]) => (
-            <div key={key} style={{ marginBottom:18 }}>
-              <label style={{ fontSize:13, fontWeight:600, color:C.dark, display:"block", marginBottom:6 }}>{label}</label>
-              {type==="textarea"
-                ? <textarea value={(form as any)[key]} onChange={e => setForm(f => ({...f,[key]:e.target.value}))} placeholder={ph} style={{ width:"100%", border:`1px solid ${C.border}`, borderRadius:r, padding:"10px 12px", fontSize:14, outline:"none", minHeight:90, resize:"vertical", boxSizing:"border-box", fontFamily:"inherit" }}/>
-                : <input value={(form as any)[key]} onChange={e => setForm(f => ({...f,[key]:e.target.value}))} placeholder={ph} style={{ width:"100%", border:`1px solid ${C.border}`, borderRadius:r, padding:"10px 12px", fontSize:14, outline:"none", boxSizing:"border-box" }}/>
-              }
-            </div>
-          ))}
+          <div style={{ marginBottom:18 }}>
+            <label style={{ fontSize:13, fontWeight:600, color:C.dark, display:"block", marginBottom:6 }}>Titre</label>
+            <input value={form.title} onChange={e => setForm(f => ({...f,title:e.target.value}))} placeholder="Ex: Vélo de route Trek taille 54" style={{ width:"100%", border:`1px solid ${C.border}`, borderRadius:r, padding:"10px 12px", fontSize:14, outline:"none", boxSizing:"border-box" }}/>
+          </div>
+          <div style={{ marginBottom:18 }}>
+            <label style={{ fontSize:13, fontWeight:600, color:C.dark, display:"block", marginBottom:6 }}>Description</label>
+            <textarea value={form.description} onChange={e => setForm(f => ({...f,description:e.target.value}))} placeholder="Décrivez honnêtement l'objet…" style={{ width:"100%", border:`1px solid ${C.border}`, borderRadius:r, padding:"10px 12px", fontSize:14, outline:"none", minHeight:90, resize:"vertical", boxSizing:"border-box", fontFamily:"inherit" }}/>
+          </div>
           <div style={{ marginBottom:18 }}>
             <label style={{ fontSize:13, fontWeight:600, color:C.dark, display:"block", marginBottom:6 }}>État</label>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
@@ -418,7 +404,6 @@ function PublishPage({ go }: { go: (p: string) => void }) {
           </div>
         </div>
       )}
-
       {step===3 && (
         <div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:18 }}>
@@ -440,12 +425,11 @@ function PublishPage({ go }: { go: (p: string) => void }) {
           </div>
         </div>
       )}
-
       {step===4 && (
         <div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24 }}>
             <div>
-              <h3 style={{ fontSize:15, fontWeight:700, color:C.dark, marginBottom:12 }}>Aperçu de votre annonce</h3>
+              <h3 style={{ fontSize:15, fontWeight:700, color:C.dark, marginBottom:12 }}>Aperçu</h3>
               <div style={{ border:`1px solid ${C.sageL}`, borderRadius:rl, overflow:"hidden", maxWidth:220 }}>
                 <div style={{ height:120, background:C.sageBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:40 }}>{photos[0] || "📦"}</div>
                 <div style={{ padding:10 }}>
@@ -470,15 +454,13 @@ function PublishPage({ go }: { go: (p: string) => void }) {
           </div>
         </div>
       )}
-
       {step===5 && (
         <div style={{ textAlign:"center", padding:"40px 0" }}>
           <div style={{ fontSize:56, marginBottom:16 }}>🎉</div>
           <h2 style={{ fontSize:22, fontWeight:800, color:C.dark, marginBottom:8 }}>Annonce publiée !</h2>
-          <p style={{ color:C.muted, marginBottom:24 }}>Votre annonce est maintenant visible par tous les visiteurs de Reviv.ch.</p>
-          <div style={{ display:"flex", gap:12, justifyContent:"center" }}>
+          <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:16 }}>
             <button onClick={() => go("listing")} style={{ background:C.sage, color:"#fff", border:"none", borderRadius:r, padding:"11px 20px", fontWeight:700, cursor:"pointer" }}>Voir mon annonce</button>
-            <button onClick={() => go("home")} style={{ background:"transparent", border:`1.5px solid ${C.sage}`, color:C.sage, borderRadius:r, padding:"11px 20px", fontWeight:700, cursor:"pointer" }}>Retour à l'accueil</button>
+            <button onClick={() => go("home")} style={{ background:"transparent", border:`1.5px solid ${C.sage}`, color:C.sage, borderRadius:r, padding:"11px 20px", fontWeight:700, cursor:"pointer" }}>Retour à l&apos;accueil</button>
           </div>
         </div>
       )}
@@ -492,45 +474,40 @@ function VerifyPage() {
   const [idVerified, setIdVerified] = useState(false);
   const [addrVerified, setAddrVerified] = useState(false);
 
-  const doId = () => { setIdDone(true); setTimeout(() => setIdVerified(true), 2500); };
-  const doAddr = () => { setAddrDone(true); setTimeout(() => setAddrVerified(true), 2500); };
-
   return (
-    <div style={{ maxWidth:560, margin:"0 auto", padding:"40px 20px", fontFamily:"Inter,sans-serif" }}>
-      <h1 style={{ fontSize:24, fontWeight:800, color:C.dark, marginBottom:6 }}>Vérification d'identité</h1>
+    <div style={{ maxWidth:560, margin:"0 auto", padding:"40px 20px" }}>
+      <h1 style={{ fontSize:24, fontWeight:800, color:C.dark, marginBottom:6 }}>Vérification d&apos;identité</h1>
       <p style={{ fontSize:14, color:C.muted, marginBottom:28 }}>Obligatoire pour publier · Rapide et sécurisé</p>
       <div style={{ background:C.sageBg, border:`1px solid ${C.sageL}`, borderRadius:r, padding:"14px 16px", marginBottom:24, fontSize:13, color:C.sage }}>
-        🔒 Vos données restent privées. Seul le badge "Vendeur vérifié" est visible publiquement.
+        🔒 Vos données restent privées. Seul le badge &quot;Vendeur vérifié&quot; est visible publiquement.
       </div>
       {[
-        { num:"✓", label:"Créer un compte", desc:"Email confirmé.", done:true, verified:true, content:null },
-        { num:"2", label:"Pièce d'identité", desc:"Carte d'identité, passeport ou permis valide.", done:idDone, verified:idVerified, content: !idDone
-          ? <div onClick={doId} style={{ border:`2px dashed ${C.border}`, borderRadius:r, padding:20, textAlign:"center", cursor:"pointer", color:C.muted }}><div style={{ fontSize:28, marginBottom:6 }}>🪪</div><div style={{ fontWeight:600, color:C.dark, fontSize:13 }}>Cliquez pour envoyer</div></div>
-          : <div style={{ border:`1.5px solid ${C.sage}`, borderRadius:r, padding:"12px 16px", background:C.sageBg, display:"flex", alignItems:"center", gap:10, color:C.sage, fontWeight:600, fontSize:13 }}>✅ Document envoyé <span style={{ marginLeft:"auto", background: idVerified ? C.sageBg : "#FEF3C7", color: idVerified ? C.sage : "#92400E", padding:"3px 9px", borderRadius:999, fontSize:11, fontWeight:700 }}>{idVerified ? "✓ Confirmée" : "⏳ En vérification"}</span></div>
+        { num:"✓", label:"Créer un compte", desc:"Email confirmé.", done:true, verified:true, action:null },
+        { num:"2", label:"Pièce d'identité", desc:"Carte d'identité, passeport ou permis valide.", done:idDone, verified:idVerified,
+          action: !idDone
+            ? <div onClick={() => { setIdDone(true); setTimeout(() => setIdVerified(true), 2500); }} style={{ border:`2px dashed ${C.border}`, borderRadius:r, padding:20, textAlign:"center", cursor:"pointer", color:C.muted }}><div style={{ fontSize:28, marginBottom:6 }}>🪪</div><div style={{ fontWeight:600, color:C.dark, fontSize:13 }}>Cliquez pour envoyer</div></div>
+            : <div style={{ border:`1.5px solid ${C.sage}`, borderRadius:r, padding:"12px 16px", background:C.sageBg, display:"flex", alignItems:"center", gap:10, color:C.sage, fontWeight:600, fontSize:13 }}>✅ Document envoyé <span style={{ marginLeft:"auto", background: idVerified ? C.sageBg : "#FEF3C7", color: idVerified ? C.sage : "#92400E", padding:"3px 9px", borderRadius:999, fontSize:11 }}>{idVerified ? "✓ Confirmée" : "⏳ En vérification"}</span></div>
         },
-        { num:"3", label:"Confirmation d'adresse", desc:"Facture ou relevé de moins de 3 mois.", done:addrDone, verified:addrVerified, content: !addrDone
-          ? <div onClick={idVerified ? doAddr : undefined} style={{ border:`2px dashed ${C.border}`, borderRadius:r, padding:20, textAlign:"center", cursor: idVerified ? "pointer" : "default", color:C.muted, opacity: idVerified ? 1 : .5 }}><div style={{ fontSize:28, marginBottom:6 }}>🏠</div><div style={{ fontWeight:600, color:C.dark, fontSize:13 }}>{idVerified ? "Cliquez pour envoyer" : "Disponible après étape 2"}</div></div>
-          : <div style={{ border:`1.5px solid ${C.sage}`, borderRadius:r, padding:"12px 16px", background:C.sageBg, display:"flex", alignItems:"center", gap:10, color:C.sage, fontWeight:600, fontSize:13 }}>✅ Document envoyé <span style={{ marginLeft:"auto", background: addrVerified ? C.sageBg : "#FEF3C7", color: addrVerified ? C.sage : "#92400E", padding:"3px 9px", borderRadius:999, fontSize:11, fontWeight:700 }}>{addrVerified ? "✓ Confirmée" : "⏳ En vérification"}</span></div>
+        { num:"3", label:"Confirmation d'adresse", desc:"Facture ou relevé de moins de 3 mois.", done:addrDone, verified:addrVerified,
+          action: !addrDone
+            ? <div onClick={idVerified ? () => { setAddrDone(true); setTimeout(() => setAddrVerified(true), 2500); } : undefined} style={{ border:`2px dashed ${C.border}`, borderRadius:r, padding:20, textAlign:"center", cursor: idVerified ? "pointer" : "default", color:C.muted, opacity: idVerified ? 1 : .5 }}><div style={{ fontSize:28, marginBottom:6 }}>🏠</div><div style={{ fontWeight:600, color:C.dark, fontSize:13 }}>{idVerified ? "Cliquez pour envoyer" : "Disponible après étape 2"}</div></div>
+            : <div style={{ border:`1.5px solid ${C.sage}`, borderRadius:r, padding:"12px 16px", background:C.sageBg, display:"flex", alignItems:"center", gap:10, color:C.sage, fontWeight:600, fontSize:13 }}>✅ Document envoyé <span style={{ marginLeft:"auto", background: addrVerified ? C.sageBg : "#FEF3C7", color: addrVerified ? C.sage : "#92400E", padding:"3px 9px", borderRadius:999, fontSize:11 }}>{addrVerified ? "✓ Confirmée" : "⏳ En vérification"}</span></div>
         },
-        { num:"4", label:"Badge vérifié activé", desc:"Délai : 24h ouvrables après validation.", done:false, verified:false, content:null },
+        { num:"4", label:"Badge vérifié activé", desc:"Délai : 24h ouvrables après validation.", done:false, verified:false, action:null },
       ].map((step, i) => (
         <div key={i} style={{ display:"flex", gap:16, alignItems:"flex-start", padding:"16px 0", borderBottom:`1px solid ${C.border}`, opacity: i===3 && !addrVerified ? .4 : 1 }}>
-          <div style={{ width:32, height:32, borderRadius:"50%", background: step.verified ? C.sageBg : step.done ? C.sageBg : i===0 ? C.sage : C.light, color: step.verified ? C.sage : i===0 ? "#fff" : C.muted, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14, flexShrink:0 }}>{step.verified ? "✓" : step.num}</div>
+          <div style={{ width:32, height:32, borderRadius:"50%", background: step.verified ? C.sageBg : i===0 ? C.sage : C.light, color: step.verified ? C.sage : i===0 ? "#fff" : C.muted, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14, flexShrink:0 }}>{step.verified ? "✓" : step.num}</div>
           <div style={{ flex:1 }}>
             <div style={{ fontWeight:700, fontSize:14, color: i===3 && !addrVerified ? C.muted : C.dark, marginBottom:3 }}>{step.label}</div>
-            <div style={{ fontSize:13, color:C.muted, marginBottom: step.content ? 10 : 0 }}>{step.desc}</div>
-            {step.content}
+            <div style={{ fontSize:13, color:C.muted, marginBottom: step.action ? 10 : 0 }}>{step.desc}</div>
+            {step.action}
           </div>
         </div>
       ))}
-      <button style={{ background:C.sage, color:"#fff", border:"none", borderRadius:r, padding:"12px 24px", fontWeight:700, fontSize:14, cursor:"pointer", marginTop:8 }}>
-        → Continuer vers la publication
-      </button>
     </div>
   );
 }
 
-// ─── FOOTER ───────────────────────────────────────────────
 function Footer({ go }: { go: (p: string) => void }) {
   return (
     <footer style={{ borderTop:`1px solid ${C.border}`, marginTop:32, background:C.light }}>
@@ -545,20 +522,21 @@ function Footer({ go }: { go: (p: string) => void }) {
   );
 }
 
-// ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
   const [page, setPage] = useState("home");
   const go = (p: string) => { setPage(p); window.scrollTo({ top:0, behavior:"smooth" }); };
 
   return (
-    <div style={{ fontFamily:"Inter,system-ui,sans-serif", color:C.text, background:"#fff", minHeight:"100vh" }}>
-      <TrustBar />
-      <Header go={go} />
-      {page==="home"    && <HomePage go={go} />}
-      {page==="listing" && <ListingPage go={go} />}
-      {page==="publish" && <PublishPage go={go} />}
-      {page==="verify"  && <VerifyPage />}
-      <Footer go={go} />
-    </div>
+    <SessionProvider>
+      <div style={{ fontFamily:"Inter,system-ui,sans-serif", color:C.text, background:"#fff", minHeight:"100vh" }}>
+        <TrustBar />
+        <Header go={go} />
+        {page==="home"    && <HomePage go={go} />}
+        {page==="listing" && <ListingPage go={go} />}
+        {page==="publish" && <PublishPage go={go} />}
+        {page==="verify"  && <VerifyPage />}
+        <Footer go={go} />
+      </div>
+    </SessionProvider>
   );
 }
